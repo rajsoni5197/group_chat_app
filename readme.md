@@ -13,9 +13,9 @@
 
 ```npm install```
 or 
-```npm i``
+```npm i```
 
-this will make node_modules folder and install required dependencies for this project in this folder.
+   this will make node_modules folder and install required dependencies for this project in this folder.
 
 3. run npm start to start the server:
 
@@ -23,7 +23,7 @@ this will make node_modules folder and install required dependencies for this pr
 or 
 ```node server.js```
 
-this will start your server.
+    this will start your server.
 >to run it on a specific port change the port variable  accordingly.
 
 4. now your server is running. now you can check this on your browser by visiting localhost:<port>
