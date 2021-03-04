@@ -1,0 +1,16 @@
+{
+  "name": "websocket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "websocket": "1.0.33"
+  },
+  "devDependencies": {},
+  "author": "raj soni",
+  "license": "ISC"
+}

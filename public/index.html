@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>webscocket</title>
+    
+</head>
+
+<body>
+    <style>
+        #messageArea{
+            padding: 3vw;
+            background-color: rgb(180, 240, 255);
+            margin-left: auto;
+            margin-right: auto;
+            height:70vh;
+            width:90vw;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+    </style>
+    <div id="WebsocketConnection">
+        <input type="text" id="name" value='type your name..'>
+        
+
+        <button id="connect">connect</button>
+
+    </div><br>
+    <div id="div" style="display: none;">
+        <div id="game">
+            <button id="newGame">Create newRoom</button>
+            <input type="text" id="roomName" value='enter Room Name..'>
+            <br>
+            <button id="joinGame">join Room</button>
+            <input type="text" id="input">
+            <br><br>
+            <span id="gameId" ></span>
+        </div>
+        <br>
+        <div id="send" style="display: none;">
+            <input type="text" id="sendInput">
+            <button id="sendButton">send</button>
+        </div>
+        <br>
+        <hr>
+        <div id="messageArea" ></div>
+    </div>
+
+    <script src="./index.js"></script>
+</body>
+
+</html>
