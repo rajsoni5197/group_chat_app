@@ -21,7 +21,7 @@ const gameRoom = {};
 
 
 const websocket = new WebSocketServer({
-    httpsServer: server
+    httpServer: server
 })
 websocket.on('request', request => {
     console.log("recieved websocket request");
