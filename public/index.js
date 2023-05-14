@@ -25,7 +25,7 @@ function wsConnect() {
         alert('enter name first');
         return;
     };
-    ws = new WebSocket("wss://relieved-red-hoodie.cyclic.app");
+    ws = new WebSocket("wss://" + window.location.host);
 
     ws.onopen = () => {
         let payload = {
