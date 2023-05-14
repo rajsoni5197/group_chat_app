@@ -27,6 +27,7 @@ function wsConnect() {
     };
     var host =  window.location.host;
     host = host.slice(0, -1);
+    console.log(host);
     ws = new WebSocket("wss://" + host);
 
     ws.onopen = () => {
