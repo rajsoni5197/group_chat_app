@@ -24,7 +24,7 @@ const websocket = new WebSocketServer({
     httpServer: server
 })
 websocket.on('request', request => {
-    // console.log("recieved websocket request");
+    console.log("recieved websocket request");
     
     let connection = request.accept(null, request.origin);
 
