@@ -25,7 +25,8 @@ function wsConnect() {
         alert('enter name first');
         return;
     };
-    var host = window.location.host.replace(/\/$/, '');
+    var host =  window.location.host;
+    host = host.slice(0, -1);
     ws = new WebSocket("wss://" + host);
 
     ws.onopen = () => {
