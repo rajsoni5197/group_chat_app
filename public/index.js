@@ -25,7 +25,7 @@ function wsConnect() {
         alert('enter name first');
         return;
     };
-    ws = new WebSocket("wss://agile-bayou-93781.herokuapp.com");
+    ws = new WebSocket("wss://relieved-red-hoodie.cyclic.app");
 
     ws.onopen = () => {
         let payload = {
