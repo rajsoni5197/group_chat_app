@@ -25,7 +25,8 @@ function wsConnect() {
         alert('enter name first');
         return;
     };
-    ws = new WebSocket("wss://" + window.location.host);
+    var host = window.location.host.replace(/\/$/, '');
+    ws = new WebSocket("wss://" + host);
 
     ws.onopen = () => {
         let payload = {
