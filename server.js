@@ -5,7 +5,7 @@ const path = require("path");
 
 
 
-const port = process.env.PORT||4001;
+const port = process.env.PORT;
 const app = express();
 
 const server = http.createServer(app).listen(port, () => console.log("listening to port 4001"));
