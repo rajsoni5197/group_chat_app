@@ -13,10 +13,10 @@ app.use("/", (req, res, next) => {
     next();
 });
 app.use(express.static(path.join(__dirname, "public")));
-
+console.log("Hi i am here ");
 // WebSocket server
 const wss = new WebSocket.Server({ server });
-console.log("Hi i am here ");
+
 // Clients and game rooms
 const clients = {};
 const gameRoom = {};
