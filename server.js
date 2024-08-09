@@ -1,144 +1,125 @@
+const express = require('express');
 const http = require('http');
-const express = require('express')
-const WebSocketServer = require("websocket").server;
+const WebSocket = require('ws');
 const path = require("path");
 
-
-
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const app = express();
 
-const server = http.createServer(app).listen(port, () => console.log("listening to port 4001"));
+const server = http.createServer(app);
+
 app.use("/", (req, res, next) => {
-    console.log('req')
+    console.log('req');
     next();
 });
 app.use(express.static(path.join(__dirname, "public")));
 
-//websocket 
+// WebSocket server
+const wss = new WebSocket.Server({ server });
+
+// Clients and game rooms
 const clients = {};
 const gameRoom = {};
 
-
-const websocket = new WebSocketServer({
-    httpServer: server
-})
-websocket.on('request', request => {
-    console.log("recieved websocket request");
+wss.on('connection', (ws) => {
+    console.log("New WebSocket connection");
     
-    let connection = request.accept(null, request.origin);
-
     let clientId = guid();
 
-    connection.on('message', (message) => {
-        let recievedMessage = JSON.parse(message.utf8Data);
+    ws.on('message', (message) => {
+        let receivedMessage = JSON.parse(message);
         
-        if (recievedMessage.method === "newConnect" && !recievedMessage.clientId) {
+        if (receivedMessage.method === "newConnect" && !receivedMessage.clientId) {
             clients[clientId] = {
                 "Id": clientId,
-                "name": recievedMessage.name,
-                'connection': connection
-            }
-            // console.log(clients)
+                "name": receivedMessage.name,
+                'connection': ws
+            };
+            
             if (clients[clientId]) {
                 let payload = {
                     "method": "newConnection",
                     "status": "successful",
                     "yourId": clients[clientId].Id
-                }
-                // console.log(payload)
-                clients[clientId].connection.send(JSON.stringify(payload))
+                };
+                clients[clientId].connection.send(JSON.stringify(payload));
             }
-             console.log(clients[clientId].connection)
         }
-        else if (clients.hasOwnProperty(recievedMessage.clientId)) {
-            switch (recievedMessage.method) {
+        else if (clients.hasOwnProperty(receivedMessage.clientId)) {
+            switch (receivedMessage.method) {
                 case 'createRoom':
                     let gameId = guid();
                     gameRoom[gameId] = {
-                        "creator": recievedMessage.clientId,
-                        "gameMembersId": [recievedMessage.clientId],
-                        "name": recievedMessage.name
-                    }
+                        "creator": receivedMessage.clientId,
+                        "gameMembersId": [receivedMessage.clientId],
+                        "name": receivedMessage.name
+                    };
 
                     let payload = {
                         "method": "createRoom",
                         "status": "successful",
                         "gameId": gameId,
                         "gameName": gameRoom[gameId].name
-                    }
+                    };
                     clients[clientId].connection.send(JSON.stringify(payload));
-                    // console.log(gameRoom)
                     break;
                 case 'joinRoom':
-
-                    if (gameRoom.hasOwnProperty(recievedMessage.gameId)) {
-                        gameRoom[recievedMessage.gameId].gameMembersId.push(recievedMessage.clientId)
-                        // console.log(gameRoom);
-                        let status = gameRoom[recievedMessage.gameId].gameMembersId.some(ele => {
-                            return ele == recievedMessage.clientId;
-                        })
+                    if (gameRoom.hasOwnProperty(receivedMessage.gameId)) {
+                        gameRoom[receivedMessage.gameId].gameMembersId.push(receivedMessage.clientId);
+                        let status = gameRoom[receivedMessage.gameId].gameMembersId.includes(receivedMessage.clientId);
                         if (status) {
-
                             let payload = {
                                 "method": "joinRoom",
                                 "status": "successful",
-                                "gameId": recievedMessage.gameId,
-                                "gameName": gameRoom[recievedMessage.gameId].name
-                            }
-                            clients[recievedMessage.clientId].connection.send(JSON.stringify(payload));
+                                "gameId": receivedMessage.gameId,
+                                "gameName": gameRoom[receivedMessage.gameId].name
+                            };
+                            clients[receivedMessage.clientId].connection.send(JSON.stringify(payload));
 
-                            gameRoom[recievedMessage.gameId].gameMembersId.forEach(ele => {
-                                if (ele !== recievedMessage.clientId) {
+                            gameRoom[receivedMessage.gameId].gameMembersId.forEach(ele => {
+                                if (ele !== receivedMessage.clientId) {
                                     let payload = {
                                         "method": "serverUpdate",
                                         "status": "successful",
                                         "sender": "server",
                                         "reason": "newMember",
-                                        "update": `${clients[recievedMessage.clientId].name} joined the Room`
-                                    }
+                                        "update": `${clients[receivedMessage.clientId].name} joined the Room`
+                                    };
                                     clients[`${ele}`].connection.send(JSON.stringify(payload));
                                 }
-                            })
-
-                            
+                            });
                         }
-
-
-
                     }
-
-
                     break;
                 case 'chat':
-                    if(gameRoom.hasOwnProperty(recievedMessage.gameId)){
-                        gameRoom[recievedMessage.gameId].gameMembersId.forEach(ele =>{
+                    if(gameRoom.hasOwnProperty(receivedMessage.gameId)){
+                        gameRoom[receivedMessage.gameId].gameMembersId.forEach(ele => {
                             let payload = {
-                                "method":"chat",
+                                "method": "chat",
                                 "status": "successful",
-                                "senderId":recievedMessage.clientId,
-                                "senderName":clients[recievedMessage.clientId].name,
-                                "senderMessage":recievedMessage.chatMessage,
-                                "gameId":recievedMessage.gameId
-                            }
+                                "senderId": receivedMessage.clientId,
+                                "senderName": clients[receivedMessage.clientId].name,
+                                "senderMessage": receivedMessage.chatMessage,
+                                "gameId": receivedMessage.gameId
+                            };
                             clients[`${ele}`].connection.send(JSON.stringify(payload));
-                        })
+                        });
                     }
                     break;
             }
         }
-    })
+    });
 
+    ws.on('close', () => {
+        console.log('WebSocket was closed');
+        // Handle disconnection
+    });
+});
 
-
-})
-
-
-
+server.listen(port, () => console.log(`Server listening on port ${port}`));
 
 function S4() {
     return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 }
 
-// then to call it, plus stitch in '4' in the third group
 const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
