@@ -28,7 +28,7 @@ function wsConnect() {
     var host =  window.location.host;
     
     console.log(host);
-    ws = new WebSocket("ws://" + host);
+    ws = new WebSocket("wss://" + host);
 
     ws.onopen = () => {
         let payload = {
